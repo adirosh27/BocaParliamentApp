@@ -12,7 +12,6 @@ import {
   Linking,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
-import messaging from '@react-native-firebase/messaging';
 import NetInfo from '@react-native-community/netinfo';
 
 const WEBSITE_URL = 'https://israeliparliament.org/boca/';
@@ -39,38 +38,7 @@ const App = () => {
     return () => unsubscribe();
   }, []);
 
-  // Request notification permissions and setup
-  useEffect(() => {
-    requestUserPermission();
-    const unsubscribe = messaging().onMessage(async remoteMessage => {
-      Alert.alert(
-        remoteMessage.notification?.title || 'New Notification',
-        remoteMessage.notification?.body || '',
-      );
-    });
-
-    // Handle notification when app is in background
-    messaging().onNotificationOpenedApp(remoteMessage => {
-      console.log('Notification opened app:', remoteMessage);
-      // Navigate to specific event if URL provided
-      if (remoteMessage.data?.url) {
-        webViewRef.current?.injectJavaScript(
-          `window.location.href = "${remoteMessage.data.url}";`
-        );
-      }
-    });
-
-    // Check if app was opened from notification
-    messaging()
-      .getInitialNotification()
-      .then(remoteMessage => {
-        if (remoteMessage && remoteMessage.data?.url) {
-          setCurrentUrl(remoteMessage.data.url as string);
-        }
-      });
-
-    return unsubscribe;
-  }, []);
+  // Notification setup removed - can be added later with Firebase configuration
 
   // Handle Android back button
   useEffect(() => {
@@ -90,20 +58,6 @@ const App = () => {
     return () => backHandler.remove();
   }, [canGoBack]);
 
-  // Request notification permission
-  const requestUserPermission = async () => {
-    const authStatus = await messaging().requestPermission();
-    const enabled =
-      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-
-    if (enabled) {
-      const token = await messaging().getToken();
-      console.log('FCM Token:', token);
-      // Send this token to your server to send notifications
-      // await sendTokenToServer(token);
-    }
-  };
 
   const handleNavigationStateChange = (navState: any) => {
     setCanGoBack(navState.canGoBack);
