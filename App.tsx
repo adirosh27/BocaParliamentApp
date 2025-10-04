@@ -14,7 +14,7 @@ import {
 import { WebView } from 'react-native-webview';
 import NetInfo from '@react-native-community/netinfo';
 
-const WEBSITE_URL = 'https://israeliparliament.org/boca/';
+const WEBSITE_URL = 'https://israeliparliament.org/boca/user/';
 
 const App = () => {
   const webViewRef = useRef<WebView>(null);
